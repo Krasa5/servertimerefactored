@@ -1,0 +1,129 @@
+import discord
+from discord.ext import commands, tasks
+from datetime import datetime, time, timedelta
+import datetime as dt
+from itertools import cycle
+import asyncio
+import pickle
+
+#Name of cog is the file name, not class.
+class AmongUs(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+    
+    @commands.Cog.listener()
+    async def on_ready(self):
+        print('Among Us cog is loaded.')
+
+    @commands.command()
+    @commands.max_concurrency(1)
+    async def amongus(self, ctx, *, gameID='No Code Provided'):
+        if ctx.author.voice and ctx.author.voice.channel:
+            authorCh = ctx.author.voice.channel
+            await authorCh.set_permissions(ctx.guild.default_role, use_voice_activation=True)
+        else:
+            await ctx.send('Please join a voice channel to start playing.')
+            return
+    
+        async def start(playstatus):
+            await authorCh.set_permissions(ctx.guild.default_role, use_voice_activation=True)
+            members_list = [member.name for member in authorCh.members]
+
+            # Embed
+            amongstart = discord.Embed(
+                title = 'Among Us Bot',
+                description =  'Discord Bot helper for Among Us!',
+                colour = discord.Colour.blue()
+            )
+            amongstart.set_image(url='https://i.ibb.co/jwMHxQT/start.jpg')
+            amongstart.add_field(name='Game ID: ', value=gameID, inline=False)
+            amongstart.add_field(name='Players: ', value=', \n'.join(members_list), inline= False)
+            amongstart.add_field(name='Instructions ', value='All players in the voice channel can react to emoji to start the game.', inline= False)
+            amongstart.set_footer(text=(f'Game started by: {ctx.author}'))
+            msg = await ctx.send(embed=amongstart)
+            await msg.add_reaction('\U00002705')
+            await msg.add_reaction('\U0000274C')
+
+            def check(reaction,user):
+                return (user in authorCh.members and (str(reaction.emoji) == '\U00002705' or str(reaction.emoji) == '\U0000274C'))
+                    
+            result = await self.bot.wait_for('reaction_add', check=check)
+
+            if result[0].emoji == '\U00002705':
+                await msg.delete()
+                return playstatus
+            elif result[0].emoji == '\U0000274C':
+                await msg.delete()
+                playstatus = False
+                return playstatus
+        
+        async def playing(playstatus):
+            await authorCh.set_permissions(ctx.guild.default_role, use_voice_activation=False)
+            playing_embed = discord.Embed(
+                title = 'Shhhhhh! Game is underway.',
+                description= 'Press the unmute button to start discussions.', 
+                colour = discord.Colour.red()
+            )
+            playing_embed.add_field(name='Game ID: ', value=gameID, inline=False)
+            playing_embed.set_image(url='https://i.ibb.co/sJvKyFv/unmute.jpg')
+            playing_embed.set_footer(text=(f'All players in voice channel can react to emoji to go to discussions round.'))
+            playing = await ctx.send(embed=playing_embed)
+
+            await playing.add_reaction('\U0001F508')
+            await playing.add_reaction('\U0001F503')
+
+            def check(reaction, user):
+                return (user in authorCh.members and (str(reaction.emoji) == '\U0001F508' or str(reaction.emoji) == '\U0001F503'))
+            result = await self.bot.wait_for('reaction_add', check=check)
+
+            if result[0].emoji == '\U0001F508':
+                await playing.delete()
+                return playstatus
+            elif result[0].emoji == '\U0001F503':
+                await playing.delete()
+                playstatus = False
+                return playstatus
+
+
+        async def discussions(playstatus):
+            await authorCh.set_permissions(ctx.guild.default_role, use_voice_activation=True)
+            discussions_embed = discord.Embed(
+                title = 'Voting round. Discuss!',
+                description =  'Press the mute button when voting round ends.',
+                colour = discord.Colour.green()
+            )
+            discussions_embed.add_field(name='Game ID: ', value=gameID, inline=False)
+            discussions_embed.set_image(url='https://i.ibb.co/RHS0jg3/mute.jpg')
+            discussions_embed.set_footer(text=(f'All players in voice channel can react to emoji to go to playing round.'))
+            discussions = await ctx.send(embed=discussions_embed)
+            await discussions.add_reaction('\U0001F507')
+            await discussions.add_reaction('\U0001F503')
+
+            def check(reaction,user):
+                return (user in authorCh.members and (str(reaction.emoji) == '\U0001F507' or str(reaction.emoji) == '\U0001F503'))
+
+            result = await self.bot.wait_for('reaction_add', check=check)
+            if result[0].emoji == '\U0001F507':
+                await discussions.delete()
+                return playstatus
+            elif result[0].emoji == '\U0001F503':
+                await discussions.delete()
+                playstatus = False
+                return playstatus
+
+        while True:
+            playstatus = True
+            continue_game = True
+            play_on = await start(playstatus)
+            if play_on == True:
+                while continue_game == True:
+                    continue_game = await playing(playstatus)
+                    if continue_game == False:
+                        break
+                    else:
+                        continue_game = await discussions(playstatus)
+            else:
+                break
+                
+def setup(bot):
+    bot.add_cog(AmongUs(bot))

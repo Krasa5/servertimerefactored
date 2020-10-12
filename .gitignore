@@ -1,0 +1,5 @@
+*.pyc
+botkeyrefactored.txt
+amongus/__pycache__/
+cogs/__pycache__/
+hangman/__pycache__/
