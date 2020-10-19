@@ -7,7 +7,10 @@ import asyncio
 import pickle
 import os
 
-bot = commands.Bot(command_prefix="s!")
+
+intents = discord.Intents.all()
+
+bot = commands.Bot(command_prefix="s!", intents=intents)
 channel_id = 693467686146932832
 version = 0.21
 

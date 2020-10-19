@@ -5,10 +5,9 @@ from datetime import datetime, time, timedelta
 from itertools import cycle
 
 import discord
+from mvc.amongus.controller import AmongUsGame
 from discord.ext import commands, tasks
-
-from hangman.controller import HangmanGame
-from amongus.controller import AmongUsGame
+from mvc.hangman.controller import HangmanGame
 
 hangman_games = {}
 
