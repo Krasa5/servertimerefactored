@@ -3,15 +3,16 @@ import random
 
 games = {}
 
+
 class HangmanGame:
     current_game = None
     # Outputs
     def get_secret_word(self):
         return self.current_game.word
-    
+
     def get_guess_string(self):
         return ",".join(self.current_game.guesses)
-    
+
     def get_progress_string(self):
         return self.current_game.progress_word
 
@@ -30,13 +31,12 @@ class HangmanGame:
             is_word = True
         else:
             return None, None
-        
+
         if not is_word:
             self.current_game.guess(guess)
 
         is_game_over, won = self.current_game.is_game_over(guess)
         return is_game_over, won
-
 
     def get_game(self, player_id):
         if player_id in games.keys():
@@ -47,13 +47,13 @@ class HangmanGame:
             self.create_game(player_id)
 
     def get_random_word(self):
-        words = ['Discord', 'Python', 'Google', 'Apple', 'Asus']
+        words = ["Discord", "Python", "Google", "Apple", "Asus"]
         return random.choice(words)
-    
+
     def create_game(self, player_id):
         self.current_game = Hangman(self.get_random_word())
         self.save(player_id)
-    
+
     def save(self, player_id):
         games[player_id] = self.current_game
 

@@ -14,7 +14,7 @@ class Hangman:
 
         if self.check_guesses_left() == 0:
             game_over = True
-        
+
         won = self.check_word_guess(guess)
         if won:
             game_over = True

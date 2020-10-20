@@ -2,6 +2,7 @@ from .model import AmongUs
 
 games = {}
 
+
 class AmongUsGame:
     current_game = None
 
@@ -11,9 +12,15 @@ class AmongUsGame:
         self.gameID = gameID
 
     async def get_members(self):
-        members_list = [member.name for member in self.ctx.author.voice.channel.members]
+        # members_list = [member.name for member in self.ctx.author.voice.channel.members]
+        members_list = list()
+        for member in self.ctx.author.voice.channel.members:
+            if member.nick is not None:
+                members_list.append(member.nick)
+            else:
+                members_list.append(member.name)
         return members_list
-    
+
     async def run(self, guild_id):
         check = await self.check_game(guild_id)
         if check == False:
@@ -22,7 +29,7 @@ class AmongUsGame:
             status = await self.play()
             while True:
                 end = await self.check_status(status)
-                if end == 1: #ends game if true
+                if end == 1:  # ends game if true
                     await self.reset(guild_id)
                     return
                 elif end == 2:
@@ -30,7 +37,7 @@ class AmongUsGame:
 
                 status = await self.playing_round()
                 end = await self.check_status(status)
-                if end == 1: #ends game if true
+                if end == 1:  # ends game if true
                     await self.reset(guild_id)
                     return
                 elif end == 2:
@@ -46,19 +53,19 @@ class AmongUsGame:
     async def playing_round(self):
         status = await self.current_game.playing(self.ctx)
         return status
-            
+
     async def discussions_round(self):
         status = await self.current_game.discussions(self.ctx)
         return status
 
     async def check_status(self, status):
-        if status[0].emoji == '\U0000274C':
+        if status[0].emoji == "\U0000274C":
             return 1
-        elif status[0].emoji == '\U0001F503':
+        elif status[0].emoji == "\U0001F503":
             return 2
         else:
             False
-    
+
     async def check_game(self, guild_id):
         if guild_id in games.keys():
             # self.current_game = games[guild_id]
