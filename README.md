@@ -1,0 +1,3 @@
+# servertimerefactored
+
+Personal Discord Bot.
