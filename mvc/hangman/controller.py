@@ -1,20 +1,39 @@
 from .model import Hangman
 import random
+import os
+import discord
 
 games = {}
 
-
 class HangmanGame:
     current_game = None
+
     # Outputs
     def get_secret_word(self):
-        return self.current_game.word
+        return self.current_game.word  # attribute word
 
     def get_guess_string(self):
         return ",".join(self.current_game.guesses)
 
     def get_progress_string(self):
         return self.current_game.progress_word
+
+    def get_number_of_guesses_left(self):
+        return self.current_game.check_guesses_left()  # method
+
+    def embed_message(self):
+        embed = discord.Embed(Title="Hangman Game", description="Guess the word!")
+        embed.add_field(
+            name="Word: ",
+            value=self.get_progress_string(),
+            inline=False,
+        )
+        embed.add_field(name="Your guesses: ", value=self.get_guess_string())
+        embed.add_field(
+            name="Guess left: ",
+            value=self.get_number_of_guesses_left(),
+        )
+        return embed
 
     # Run
     def run(self, player_id, guess):
@@ -47,8 +66,13 @@ class HangmanGame:
             self.create_game(player_id)
 
     def get_random_word(self):
-        words = ["Discord", "Python", "Google", "Apple", "Asus"]
-        return random.choice(words)
+        with open("mvc/hangman/words.txt", "r") as fp:
+            words = fp.readlines()
+        word = random.choice(words)
+        word = "".join(i for i in word if i.isalpha())
+        # print(word)
+        # print(f"Word is: {word}. Characters total: {len(word)}")
+        return word
 
     def create_game(self, player_id):
         self.current_game = Hangman(self.get_random_word())

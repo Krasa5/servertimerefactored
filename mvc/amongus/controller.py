@@ -2,7 +2,6 @@ from .model import AmongUs
 
 games = {}
 
-
 class AmongUsGame:
     current_game = None
 

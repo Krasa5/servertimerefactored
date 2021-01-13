@@ -11,8 +11,10 @@ class Hangman:
     def is_game_over(self, guess):
         game_over = False
         won = False
+        guesses_left = self.check_guesses_left()
+        # print(f"Guesses left: {guesses_left}")
 
-        if self.check_guesses_left() == 0:
+        if guesses_left == 0:
             game_over = True
 
         won = self.check_word_guess(guess)
@@ -21,7 +23,16 @@ class Hangman:
         return game_over, won
 
     def get_number_of_guesses_left(self):
-        return len(self.guesses)
+        list1 = self.guesses
+        theword = self.word.lower()
+
+        matching = [s for s in list1 if s in theword]  # total correct guesses
+        correct_guesses = len(matching)  # correct
+        total_guesses = len(list1)
+
+        # for every correct guess we want to deduct it from the amount of wrong guesses.
+        # if the user has the right answer the number of guesses won't be reduced
+        return total_guesses - correct_guesses
 
     def check_guesses_left(self):
         self.max_guesses = len(self.word)

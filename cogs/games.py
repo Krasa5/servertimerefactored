@@ -11,7 +11,6 @@ from mvc.hangman.controller import HangmanGame
 
 hangman_games = {}
 
-
 class Game(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -31,8 +30,7 @@ class Game(commands.Cog):
             await hangman_instance.reset(player_id)
             await ctx.send(game_over_message)
         else:
-            await ctx.send(f"Progress: {hangman_instance.get_progress_string()}")
-            await ctx.send(f"Guess so far: {hangman_instance.get_guess_string()}")
+            await ctx.send(embed=hangman_instance.embed_message(), delete_after=60)
 
     @commands.command()
     async def amongus(self, ctx, gameID="No code provided."):
