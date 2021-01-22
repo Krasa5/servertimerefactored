@@ -17,7 +17,7 @@ class UserCommands(commands.Cog):
     @commands.command()
     @guild_check()
     async def suhu(self, ctx):
-        msg = await ctx.send("Are you 18+?")
+        msg = await ctx.send("Are you sure you want to join this channel?")
         await msg.add_reaction("\U0001F44D")
 
         def check(reaction, user):
