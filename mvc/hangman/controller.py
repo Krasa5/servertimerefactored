@@ -5,6 +5,7 @@ import discord
 
 games = {}
 
+
 class HangmanGame:
     current_game = None
 
@@ -83,3 +84,5 @@ class HangmanGame:
 
     async def reset(self, player_id):
         games.pop(player_id)
+
+        # testetst
